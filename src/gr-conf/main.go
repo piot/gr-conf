@@ -28,7 +28,10 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"net/url"
+	"os"
+	"os/exec"
 	"path"
 
 	"github.com/google/go-github/github"
@@ -63,7 +66,34 @@ func getFilePath(prefix string, goSourceDirectory string, repo *github.Repositor
 	return complete, nil
 }
 
+func execute(log *clog.Log, tool string, args ...string) ([]byte, error) {
+	cmd := exec.Command(tool, args...)
+	log.Trace("executing", clog.String("tool", tool))
+	runErr := cmd.Run()
+	if runErr != nil {
+		return nil, runErr
+	}
+	output, outputErr := cmd.CombinedOutput()
+	if outputErr != nil {
+		return nil, outputErr
+	}
+	fmt.Printf("%v", string(output))
+	return output, nil
+}
+
+func gitClone(repoURL string, complete string, log *clog.Log) error {
+	log.Trace("cloning repo", clog.String("cloneUrl", repoURL), clog.String("targetPath", complete))
+	_, executeErr := execute(log, "git", "clone", repoURL, complete)
+	return executeErr
+}
+
 func run(organizationName string, log *clog.Log) error {
+
+	pathToGo := os.Getenv("GOPATH")
+	if pathToGo == "" {
+		return fmt.Errorf("GOPATH must be set")
+	}
+	goSourceDirectory := path.Join(pathToGo, "src/")
 	repos, reposErr := grconf.Fetch(organizationName, log)
 	if reposErr != nil {
 		return reposErr
@@ -77,10 +107,11 @@ func run(organizationName string, log *clog.Log) error {
 			continue
 		}
 		log.Trace("found repo", clog.String("repo", *repo.Name), clog.String("language", *repo.Language))
-		complete, completeErr := getFilePath("prefix", "go", repo)
+		complete, completeErr := getFilePath("prefix", goSourceDirectory, repo)
 		if completeErr != nil {
 			return completeErr
 		}
+		gitClone(*repo.CloneURL, complete, log)
 		log.Trace("complete path", clog.String("path", complete))
 	}
 
