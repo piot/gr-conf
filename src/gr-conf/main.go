@@ -41,11 +41,13 @@ import (
 	grconf "github.com/piot/gr-conf/src/lib"
 )
 
-func options() string {
+func options() (string, string) {
 	var organizationName string
 	flag.StringVar(&organizationName, "organization", "", "organization name")
+	var directory string
+	flag.StringVar(&directory, "directory", "", "directory")
 	flag.Parse()
-	return organizationName
+	return organizationName, directory
 }
 
 func repoIsGo(repo *github.Repository) bool {
@@ -87,8 +89,7 @@ func gitClone(repoURL string, complete string, log *clog.Log) error {
 	return executeErr
 }
 
-func run(organizationName string, log *clog.Log) error {
-
+func run(organizationName string, targetDirectory string, log *clog.Log) error {
 	pathToGo := os.Getenv("GOPATH")
 	if pathToGo == "" {
 		return fmt.Errorf("GOPATH must be set")
@@ -107,7 +108,7 @@ func run(organizationName string, log *clog.Log) error {
 			continue
 		}
 		log.Trace("found repo", clog.String("repo", *repo.Name), clog.String("language", *repo.Language))
-		complete, completeErr := getFilePath("prefix", goSourceDirectory, repo)
+		complete, completeErr := getFilePath(targetDirectory, goSourceDirectory, repo)
 		if completeErr != nil {
 			return completeErr
 		}
@@ -120,8 +121,13 @@ func run(organizationName string, log *clog.Log) error {
 
 func main() {
 	log := clog.DefaultLog()
-	organizationName := options()
-	err := run(organizationName, log)
+	organizationName, targetDirectory := options()
+	if targetDirectory == "" {
+		err := fmt.Errorf("directory must be specified")
+		log.Err(err)
+		return
+	}
+	err := run(organizationName, targetDirectory, log)
 	if err != nil {
 		log.Err(err)
 	}
