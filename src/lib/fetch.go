@@ -38,6 +38,7 @@ func Fetch(organizationName string, log *clog.Log) ([]*github.Repository, error)
 	client := github.NewClient(nil)
 
 	opt := &github.RepositoryListByOrgOptions{Type: "public"}
+	opt.PerPage = 100
 	repos, _, reposErr := client.Repositories.ListByOrg(context.Background(), organizationName, opt)
 
 	return repos, reposErr

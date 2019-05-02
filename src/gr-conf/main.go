@@ -131,4 +131,5 @@ func main() {
 	if err != nil {
 		log.Err(err)
 	}
+	log.Info("done")
 }
