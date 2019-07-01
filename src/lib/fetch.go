@@ -33,13 +33,21 @@ import (
 	"github.com/piot/log-go/src/clog"
 )
 
-func Fetch(organizationName string, log *clog.Log) ([]*github.Repository, error) {
+func Fetch(organizationName string, isUser bool, log *clog.Log) ([]*github.Repository, error) {
 	log.Info("fetching repos", clog.String("organization", organizationName))
 	client := github.NewClient(nil)
 
-	opt := &github.RepositoryListByOrgOptions{Type: "public"}
-	opt.PerPage = 100
-	repos, _, reposErr := client.Repositories.ListByOrg(context.Background(), organizationName, opt)
+	var repos []*github.Repository
+	var reposErr error
+	if !isUser {
+		opt := &github.RepositoryListByOrgOptions{Type: "public"}
+		opt.PerPage = 100
+		repos, _, reposErr = client.Repositories.ListByOrg(context.Background(), organizationName, opt)
+	} else {
+		opt := &github.RepositoryListOptions{Type: "public"}
+		opt.PerPage = 100
+		repos, _, reposErr = client.Repositories.List(context.Background(), organizationName, opt)
+	}
 
 	return repos, reposErr
 }

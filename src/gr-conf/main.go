@@ -95,7 +95,8 @@ func run(organizationName string, targetDirectory string, log *clog.Log) error {
 		return fmt.Errorf("GOPATH must be set")
 	}
 	goSourceDirectory := path.Join(pathToGo, "src/")
-	repos, reposErr := grconf.Fetch(organizationName, log)
+	const isUser = true
+	repos, reposErr := grconf.Fetch(organizationName, isUser, log)
 	if reposErr != nil {
 		return reposErr
 	}
