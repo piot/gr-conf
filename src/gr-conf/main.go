@@ -27,7 +27,6 @@ SOFTWARE.
 package main
 
 import (
-	"flag"
 	"fmt"
 	"net/url"
 	"os"
@@ -38,16 +37,24 @@ import (
 
 	"github.com/piot/log-go/src/clog"
 
+	"github.com/piot/cli-go/src/cli"
 	grconf "github.com/piot/gr-conf/src/lib"
 )
 
-func options() (string, string) {
-	var organizationName string
-	flag.StringVar(&organizationName, "organization", "", "organization name")
-	var directory string
-	flag.StringVar(&directory, "directory", "", "directory")
-	flag.Parse()
-	return organizationName, directory
+var Version string
+
+type FetchCmd struct {
+	Organization string `required:"" help:"Organization name on github"`
+	Directory    string `required:"" help:"work directory for source files"`
+}
+
+func (c *FetchCmd) Run(log *clog.Log) error {
+	return run(c.Organization, c.Directory, log)
+}
+
+type Options struct {
+	Fetch   FetchCmd    `cmd:""`
+	Options cli.Options `embed:""`
 }
 
 func repoIsGo(repo *github.Repository) bool {
@@ -84,7 +91,7 @@ func execute(log *clog.Log, tool string, args ...string) ([]byte, error) {
 }
 
 func gitClone(repoURL string, complete string, log *clog.Log) error {
-	log.Trace("cloning repo", clog.String("cloneUrl", repoURL), clog.String("targetPath", complete))
+	log.Debug("cloning repo", clog.String("cloneUrl", repoURL), clog.String("targetPath", complete))
 	_, executeErr := execute(log, "git", "clone", repoURL, complete)
 	return executeErr
 }
@@ -113,24 +120,17 @@ func run(organizationName string, targetDirectory string, log *clog.Log) error {
 		if completeErr != nil {
 			return completeErr
 		}
-		gitClone(*repo.CloneURL, complete, log)
 		log.Trace("complete path", clog.String("path", complete))
+		if _, err := os.Stat(complete); !os.IsNotExist(err) {
+			log.Info("directory already exists, skipping", clog.String("directory", complete))
+		} else {
+			gitClone(*repo.CloneURL, complete, log)
+		}
 	}
 
 	return nil
 }
 
 func main() {
-	log := clog.DefaultLog()
-	organizationName, targetDirectory := options()
-	if targetDirectory == "" {
-		err := fmt.Errorf("directory must be specified")
-		log.Err(err)
-		return
-	}
-	err := run(organizationName, targetDirectory, log)
-	if err != nil {
-		log.Err(err)
-	}
-	log.Info("done")
+	cli.Run(&Options{}, cli.RunOptions{ApplicationType: cli.Utility, Version: Version})
 }
