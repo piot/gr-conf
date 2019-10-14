@@ -28,7 +28,6 @@ package main
 
 import (
 	"fmt"
-	"net/url"
 	"os"
 	"os/exec"
 	"path"
@@ -44,7 +43,7 @@ import (
 var Version string
 
 type FetchCmd struct {
-	Organization string `required:"" help:"Organization name on github"`
+	Organization string `required:"" help:"Organization or username on github"`
 	Directory    string `required:"" help:"work directory for source files"`
 }
 
@@ -57,20 +56,7 @@ type Options struct {
 	Options cli.Options `embed:""`
 }
 
-func repoIsGo(repo *github.Repository) bool {
-	return *repo.Language == "Go"
-}
-
-func getFilePath(prefix string, goSourceDirectory string, repo *github.Repository) (string, error) {
-	if repoIsGo(repo) {
-		repoURL, parseErr := url.Parse(*repo.CloneURL)
-		if parseErr != nil {
-			return "", parseErr
-		}
-		suffix := repoURL.Host + repoURL.Path[:len(repoURL.Path)-4]
-		prefix := path.Join(goSourceDirectory, suffix)
-		return prefix, nil
-	}
+func getFilePath(prefix string, repo *github.Repository) (string, error) {
 	complete := path.Join(prefix, *repo.Name)
 	return complete, nil
 }
@@ -97,11 +83,6 @@ func gitClone(repoURL string, complete string, log *clog.Log) error {
 }
 
 func run(organizationName string, targetDirectory string, log *clog.Log) error {
-	pathToGo := os.Getenv("GOPATH")
-	if pathToGo == "" {
-		return fmt.Errorf("GOPATH must be set")
-	}
-	goSourceDirectory := path.Join(pathToGo, "src/")
 	const isUser = true
 	repos, reposErr := grconf.Fetch(organizationName, isUser, log)
 	if reposErr != nil {
@@ -116,7 +97,7 @@ func run(organizationName string, targetDirectory string, log *clog.Log) error {
 			continue
 		}
 		log.Trace("found repo", clog.String("repo", *repo.Name), clog.String("language", *repo.Language))
-		complete, completeErr := getFilePath(targetDirectory, goSourceDirectory, repo)
+		complete, completeErr := getFilePath(targetDirectory, repo)
 		if completeErr != nil {
 			return completeErr
 		}
