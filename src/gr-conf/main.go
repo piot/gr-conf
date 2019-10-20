@@ -44,11 +44,19 @@ var Version string
 
 type FetchCmd struct {
 	Organization string `required:"" help:"Organization or username on github"`
-	Directory    string `required:"" help:"work directory for source files"`
+	Directory    string `default:"" help:"work directory for source files"`
 }
 
 func (c *FetchCmd) Run(log *clog.Log) error {
-	return run(c.Organization, c.Directory, log)
+	directory := c.Directory
+	if directory == "" {
+		var directoryErr error
+		directory, directoryErr = os.Getwd()
+		if directoryErr != nil {
+			return directoryErr
+		}
+	}
+	return run(c.Organization, directory, log)
 }
 
 type Options struct {
@@ -77,7 +85,7 @@ func execute(log *clog.Log, tool string, args ...string) ([]byte, error) {
 }
 
 func gitClone(repoURL string, complete string, log *clog.Log) error {
-	log.Debug("cloning repo", clog.String("cloneUrl", repoURL), clog.String("targetPath", complete))
+	log.Info("cloning repo", clog.String("cloneUrl", repoURL), clog.String("targetPath", complete))
 	_, executeErr := execute(log, "git", "clone", repoURL, complete)
 	return executeErr
 }
@@ -103,7 +111,7 @@ func run(organizationName string, targetDirectory string, log *clog.Log) error {
 		}
 		log.Trace("complete path", clog.String("path", complete))
 		if _, err := os.Stat(complete); !os.IsNotExist(err) {
-			log.Info("directory already exists, skipping", clog.String("directory", complete))
+			log.Debug("directory already exists, skipping", clog.String("directory", complete))
 		} else {
 			gitClone(*repo.CloneURL, complete, log)
 		}
