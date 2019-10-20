@@ -100,11 +100,7 @@ func run(organizationName string, targetDirectory string, log *clog.Log) error {
 		if *repo.Archived {
 			continue
 		}
-		if repo.Language == nil {
-			log.Warn("no language set", clog.String("name", *repo.Name))
-			continue
-		}
-		log.Trace("found repo", clog.String("repo", *repo.Name), clog.String("language", *repo.Language))
+		log.Trace("found repo", clog.String("repo", *repo.Name))
 		complete, completeErr := getFilePath(targetDirectory, repo)
 		if completeErr != nil {
 			return completeErr
