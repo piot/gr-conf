@@ -3,12 +3,9 @@ module github.com/piot/gr-conf
 go 1.13
 
 require (
-	github.com/alecthomas/kong v0.2.0 // indirect
-	github.com/fatih/color v1.7.0 // indirect
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.0.0 // indirect
-	github.com/mattn/go-colorable v0.1.4 // indirect
-	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	github.com/piot/cli-go v0.0.0-20190902195811-80a37ff2490a
-	github.com/piot/log-go v0.0.0-20191008125346-30c073ae332c
+	github.com/piot/cli-go v0.0.0-20191014203702-34a0ba21039a
+	github.com/piot/log-go v0.0.0-20191014203607-09e9b309a41b
+	golang.org/x/sys v0.0.0-20191024172528-b4ff53e7a1cb // indirect
 )

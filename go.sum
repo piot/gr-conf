@@ -12,13 +12,15 @@ github.com/mattn/go-colorable v0.1.4 h1:snbPLB8fVfU9iwbbo30TPtbLRzwWu6aJS6Xh4eaa
 github.com/mattn/go-colorable v0.1.4/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVcfRqFIhoBtE=
 github.com/mattn/go-isatty v0.0.8 h1:HLtExJ+uU2HOZ+wI0Tt5DtUDrx8yhUqDcp7fYERX4CE=
 github.com/mattn/go-isatty v0.0.8/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hdxcsrc5s=
+github.com/mattn/go-isatty v0.0.10 h1:qxFzApOv4WsAL965uUPIsXzAKCZxN2p9UqdhFS4ZW10=
+github.com/mattn/go-isatty v0.0.10/go.mod h1:qgIWMr58cqv1PHHyhnkY9lrL7etaEgOFcMEpPG5Rm84=
 github.com/mitchellh/go-homedir v1.1.0 h1:lukF9ziXFxDFPkA1vsr5zpc1XuPDn/wFntq5mG+4E0Y=
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
-github.com/piot/cli-go v0.0.0-20190902195811-80a37ff2490a h1:mO4/QZNMorsKO3U6FwhsPtqjSccBze2QV/5tJNbulGU=
-github.com/piot/cli-go v0.0.0-20190902195811-80a37ff2490a/go.mod h1:HcI5r/Qy5bkvtuYtbjvzbkc9Dh1wKoo8vqfBVsc1G+E=
-github.com/piot/log-go v0.0.0-20191008125346-30c073ae332c h1:63GmUwPO5R18WIIVxRhJVdrSoqERHFqSfwDMLVKorWI=
-github.com/piot/log-go v0.0.0-20191008125346-30c073ae332c/go.mod h1:0XF/1q9BIH0nYitbCOQdsXawOEXWbZzRHaeFpzKGMh0=
+github.com/piot/cli-go v0.0.0-20191014203702-34a0ba21039a h1:IuYYesvEZtWFACbNJU/oXYIvod8xrepRCgrO+n4QL2E=
+github.com/piot/cli-go v0.0.0-20191014203702-34a0ba21039a/go.mod h1:xx/pQG4Rh4SAv1Gz8UdjZZjlFMghdo86X7GvX/7zJec=
+github.com/piot/log-go v0.0.0-20191014203607-09e9b309a41b h1:FUqUU8h3IZe1L1NqkpaJnz7vLF4Fo2/z7VbxgpEhLww=
+github.com/piot/log-go v0.0.0-20191014203607-09e9b309a41b/go.mod h1:pZwcBRw/9V9K7Z1MMHW+mlx/xkOhqZR+sWarMTR0Ucs=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
@@ -27,3 +29,7 @@ github.com/stretchr/testify v1.2.2 h1:bSDNvY7ZPG5RlJ8otE/7V6gMiyenm9RtJ7IUVIAoJ1
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 golang.org/x/sys v0.0.0-20190222072716-a9d3bda3a223 h1:DH4skfRX4EBpamg7iV4ZlCpblAHI6s6TDM39bFZumv8=
 golang.org/x/sys v0.0.0-20190222072716-a9d3bda3a223/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
+golang.org/x/sys v0.0.0-20191008105621-543471e840be/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20191010194322-b09406accb47/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20191024172528-b4ff53e7a1cb h1:ZxSglHghKPYD8WDeRUzRJrUJtDF0PxsTUSxyqr9/5BI=
+golang.org/x/sys v0.0.0-20191024172528-b4ff53e7a1cb/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
