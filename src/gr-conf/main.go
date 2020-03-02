@@ -40,8 +40,10 @@ import (
 	grconf "github.com/piot/gr-conf/src/lib"
 )
 
-var Version string
+// version :
+var version string
 
+// FetchCmd :
 type FetchCmd struct {
 	Organization string `required:"" help:"Organization or username on github"`
 	Directory    string `default:"" help:"work directory for source files"`
@@ -51,14 +53,22 @@ func (c *FetchCmd) Run(log *clog.Log) error {
 	directory := c.Directory
 	if directory == "" {
 		var directoryErr error
+
 		directory, directoryErr = os.Getwd()
 		if directoryErr != nil {
 			return directoryErr
 		}
 	}
-	return run(c.Organization, directory, log)
+
+	token := os.Getenv("GITHUB_TOKEN")
+	if token == "" {
+		return fmt.Errorf("must set GITHUB_TOKEN environment variable")
+	}
+
+	return run(c.Organization, directory, token, log)
 }
 
+// Options :
 type Options struct {
 	Fetch   FetchCmd    `cmd:""`
 	Options cli.Options `embed:""`
@@ -71,45 +81,62 @@ func getFilePath(prefix string, repo *github.Repository) (string, error) {
 
 func execute(log *clog.Log, tool string, args ...string) ([]byte, error) {
 	cmd := exec.Command(tool, args...)
+
 	log.Trace("executing", clog.String("tool", tool))
+
 	runErr := cmd.Run()
 	if runErr != nil {
 		return nil, runErr
 	}
+
 	output, outputErr := cmd.CombinedOutput()
 	if outputErr != nil {
 		return nil, outputErr
 	}
+
 	fmt.Printf("%v", string(output))
+
 	return output, nil
 }
 
 func gitClone(repoURL string, complete string, log *clog.Log) error {
 	log.Info("cloning repo", clog.String("cloneUrl", repoURL), clog.String("targetPath", complete))
+
 	_, executeErr := execute(log, "git", "clone", repoURL, complete)
+
 	return executeErr
 }
 
-func run(organizationName string, targetDirectory string, log *clog.Log) error {
-	const isUser = true
-	repos, reposErr := grconf.Fetch(organizationName, isUser, log)
+func run(organizationName string, targetDirectory string, accessToken string, log *clog.Log) error {
+	const isUser = false
+
+	// Comment
+	repos, reposErr := grconf.Fetch(organizationName, isUser, accessToken, log)
 	if reposErr != nil {
 		return reposErr
 	}
+
 	for _, repo := range repos {
 		if *repo.Archived {
 			continue
 		}
+
 		log.Trace("found repo", clog.String("repo", *repo.Name))
+
 		complete, completeErr := getFilePath(targetDirectory, repo)
 		if completeErr != nil {
 			return completeErr
 		}
+
 		log.Trace("complete path", clog.String("path", complete))
+
 		if _, err := os.Stat(complete); !os.IsNotExist(err) {
 			log.Debug("directory already exists, skipping", clog.String("directory", complete))
 		} else {
-			gitClone(*repo.CloneURL, complete, log)
+			cloneErr := gitClone(*repo.CloneURL, complete, log)
+			if cloneErr != nil {
+				return cloneErr
+			}
 		}
 	}
 
@@ -117,5 +144,5 @@ func run(organizationName string, targetDirectory string, log *clog.Log) error {
 }
 
 func main() {
-	cli.Run(&Options{}, cli.RunOptions{ApplicationType: cli.Utility, Version: Version})
+	cli.Run(&Options{}, cli.RunOptions{ApplicationType: cli.Utility, Version: version})
 }

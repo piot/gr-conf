@@ -28,25 +28,38 @@ package grconf
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/go-github/github"
 	"github.com/piot/log-go/src/clog"
+	"golang.org/x/oauth2"
 )
 
-func Fetch(organizationName string, isUser bool, log *clog.Log) ([]*github.Repository, error) {
+func Fetch(organizationName string, isUser bool, accessToken string, log *clog.Log) ([]*github.Repository, error) {
 	log.Info("fetching repos", clog.String("organization", organizationName))
-	client := github.NewClient(nil)
+
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: accessToken},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+
+	client := github.NewClient(tc)
 
 	var repos []*github.Repository
 	var reposErr error
 	if !isUser {
-		opt := &github.RepositoryListByOrgOptions{Type: "public"}
+		opt := &github.RepositoryListByOrgOptions{}
 		opt.PerPage = 100
 		repos, _, reposErr = client.Repositories.ListByOrg(context.Background(), organizationName, opt)
 	} else {
-		opt := &github.RepositoryListOptions{Type: "public"}
+		opt := &github.RepositoryListOptions{}
 		opt.PerPage = 100
 		repos, _, reposErr = client.Repositories.List(context.Background(), organizationName, opt)
+	}
+
+	for _, repo := range repos {
+		fmt.Printf("  %v\n", *repo.Name)
 	}
 
 	return repos, reposErr
