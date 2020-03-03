@@ -80,18 +80,13 @@ func getFilePath(prefix string, repo *github.Repository) (string, error) {
 }
 
 func execute(log *clog.Log, tool string, args ...string) ([]byte, error) {
+	log.Info("executing", clog.String("tool", tool))
+
 	cmd := exec.Command(tool, args...)
-
-	log.Trace("executing", clog.String("tool", tool))
-
-	runErr := cmd.Run()
-	if runErr != nil {
-		return nil, runErr
-	}
 
 	output, outputErr := cmd.CombinedOutput()
 	if outputErr != nil {
-		return nil, outputErr
+		return nil, fmt.Errorf("execute: combined output %w", outputErr)
 	}
 
 	fmt.Printf("%v", string(output))
@@ -139,6 +134,8 @@ func run(organizationName string, targetDirectory string, accessToken string, lo
 			}
 		}
 	}
+
+	log.Info("Done!")
 
 	return nil
 }
